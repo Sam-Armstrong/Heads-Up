@@ -14,7 +14,14 @@ using namespace std;
 /**
  * @brief Construct a new Deck object
  */
-Deck::Deck() // Game constructor
+Deck::Deck()
+{
+}
+
+/**
+ * @brief Deck destructor
+ */
+Deck::~Deck()
 {
 }
 

@@ -26,6 +26,7 @@ class Deck
     
     public:
         Deck();
+        ~Deck();
         string drawCard();
         void reset();
 };
