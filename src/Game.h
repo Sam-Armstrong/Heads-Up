@@ -14,4 +14,25 @@ class Game
                             "AD", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "JD", "QD", "KD",
                             "AS", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "JS", "QS", "KS",
                           };
+        float player1_stack;
+        float player2_stack;
+        float bb;
+        float sb;
+        string player1_hand[2];
+        string player2_hand[2];
+        string board[5];
+        Deck deck;
+        int game_stage;
+        bool continuing;
+        int winner;
+        int dealer;
+    public:
+        Game();
+        Game(float stack1, float stack2, float big_blind);
+        void runGame(int maxIterations);
+        void nextHand();
+        void resetHands();
+        bool bettingRound();
+        int winningHand(string hole_cards1[2], string hole_cards2[2], string current_board[2]);
+        string getPlayerDecision(int player_num);
 };
