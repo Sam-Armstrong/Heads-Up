@@ -26,6 +26,7 @@ class Game
         bool continuing;
         int winner;
         int dealer;
+        int playerToGo(int);
     public:
         Game();
         Game(float stack1, float stack2, float big_blind);

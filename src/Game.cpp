@@ -96,10 +96,73 @@ void Game::resetHands()
     continuing = true; // True when no one has folded, False when one player has
 }
 
+/**
+ * @brief Logic for a single round of betting
+ * 
+ * @return true if the hand should continue after this round (nobody folded)
+ * @return false if the hand should not continue after this hand (player folded)
+ */
 bool Game::bettingRound()
 {
-    // Betting round logic goes here
-    return true;
+    // TODO: Add correct logic for pre-flop (big-blind)
+    // TODO: Add logic for if a player has called more than their stack
+
+    bool each_player_been = false;
+    float player1_pot_commit = 0;
+    float player2_pot_commit = 0;
+    int player_pot_commit[] = {0, 0};
+    int player_to_act = playerToGo(dealer);
+    bool player_folded = false;
+    int it = 0;
+    string decision;
+
+    while (each_player_been == false || player1_pot_commit != player1_pot_commit)
+    {
+        decision = getPlayerDecision(player_to_act);
+
+        if (decision == "fold")
+        {
+            player_folded = true;
+            break; // TODO: Check that break cuts out of the loop
+        }
+        else if (decision == "call")
+        {
+            // Removes the call amount from the stack of the player who called, and adds to the pot
+
+            if (player_to_act == 1)
+            {
+                player1_pot_commit = player2_pot_commit;
+                player1_stack -= player2_pot_commit - player1_pot_commit;
+            }
+            else
+            {
+                player2_pot_commit = player1_pot_commit;
+                player2_stack -= player1_pot_commit - player2_pot_commit;
+            }
+        }
+        else if (decision.find("bet") != string::npos) // Check if the decision string contains the word 'bet'
+        {
+
+        }
+        else if (decision == "check")
+        {
+
+        }
+        else if (decision.find("raise") != string::npos)
+        {
+
+        }
+
+        player_to_act = playerToGo(player_to_act);
+        it++;
+
+        if (it == 2)
+        {
+            each_player_been = true;
+        }
+    }
+
+    return player_folded;
 }
 
 int Game::winningHand(string hole_cards1[2], string hole_cards2[2], string current_board[2])
@@ -122,4 +185,16 @@ string Game::getPlayerDecision(int player_num)
     string player_dec_str;
     cin >> player_dec_str;
     return player_dec_str;
+}
+
+int Game::playerToGo(int previous_player)
+{
+    if (previous_player == 1)
+    {
+        return 2;
+    }
+    else
+    {
+        return 1;
+    }
 }
