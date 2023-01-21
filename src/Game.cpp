@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #ifndef GAME_H
 #define GAME_H
 #include "Game.h"
@@ -165,10 +166,330 @@ bool Game::bettingRound()
     return player_folded;
 }
 
-int Game::winningHand(string hole_cards1[2], string hole_cards2[2], string current_board[2])
+int Game::winningHand(string hole_cards1[2], string hole_cards2[2], string current_board[5])
 {
-    // Hand showndown logic goes here
-    return 0;
+    // Create the two full hands
+    
+    string hand1[7];
+    string hand2[7];
+
+    std::copy(hole_cards1, hole_cards1 + 2, hand1);
+    std::copy(current_board, current_board + 5, hand1 + 2);
+    std::copy(hole_cards2, hole_cards2 + 2, hand2);
+    std::copy(current_board, current_board + 5, hand2 + 2);
+
+
+    // Check for a straight flush
+
+    bool hand1StraightFlush = true;
+    bool hand2StraightFlush = true;
+
+    for (int i = 0; i < 7; i++) 
+    {
+        if (hand1[i][1] != hand1[0][1]) 
+        {
+            hand1StraightFlush = false;
+        }
+        if (hand2[i][1] != hand2[0][1]) 
+        {
+            hand2StraightFlush = false;
+        }
+    }
+
+    if (hand1StraightFlush && !hand2StraightFlush) 
+    {
+        return 1;
+    } 
+    else if (!hand1StraightFlush && hand2StraightFlush) 
+    {
+        return 2;
+    } 
+    else if (hand1StraightFlush && hand2StraightFlush) 
+    {
+        return 0;
+    }
+
+    // Check for four of a kind
+
+    int hand1FourOfAKind = 0;
+    int hand2FourOfAKind = 0;
+
+    for (int i = 0; i < 7; i++) 
+    {
+        int hand1Count = 0;
+        int hand2Count = 0;
+        for (int j = 0; j < 7; j++) 
+        {
+            if (hand1[i][0] == hand1[j][0])
+            {
+                hand1Count++;
+            }
+            if (hand2[i][0] == hand2[j][0]) 
+            {
+                hand2Count++;
+            }
+        }
+        if (hand1Count == 4) 
+        {
+            hand1FourOfAKind = i;
+        }
+        if (hand2Count == 4) 
+        {
+            hand2FourOfAKind = i;
+        }
+    }
+
+    if (hand1FourOfAKind > hand2FourOfAKind) 
+    {
+        return 1;
+    } 
+    else if (hand1FourOfAKind < hand2FourOfAKind) 
+    {
+        return 2;
+    } 
+    else if (hand1FourOfAKind == hand2FourOfAKind) 
+    {
+        return 0;
+    }
+
+
+    // Check for a full house
+
+    bool hand1FullHouse = false;
+    bool hand2FullHouse = false;
+    int hand1ThreeOfAKind = 0;
+    int hand2ThreeOfAKind = 0;
+    int hand1Pair = 0;
+    int hand2Pair = 0;
+
+    for (int i = 0; i < 7; i++) 
+    {
+        int hand1Count = 0;
+        int hand2Count = 0;
+        for (int j = 0; j < 7; j++) 
+        {
+            if (hand1[i][0] == hand1[j][0]) 
+            {
+                hand1Count++;
+            }
+            if (hand2[i][0] == hand2[j][0]) 
+            {
+                hand2Count++;
+            }
+        }
+        if (hand1Count == 3) 
+        {
+            hand1ThreeOfAKind = i;
+        } 
+        else if (hand1Count == 2) 
+        {
+            hand1Pair = i;
+        }
+        if (hand2Count == 3) 
+        {
+            hand2ThreeOfAKind = i;
+        } 
+        else if (hand2Count == 2) 
+        {
+            hand2Pair = i;
+        }
+    }
+
+    if (hand1ThreeOfAKind > 0 && hand1Pair > 0) 
+    {
+        hand1FullHouse = true;
+    }
+    if (hand2ThreeOfAKind > 0 && hand2Pair > 0) 
+    {
+        hand2FullHouse = true;
+    }
+    if (hand1FullHouse && !hand2FullHouse) 
+    {
+        return 1;
+    } 
+    else if (!hand1FullHouse && hand2FullHouse) 
+    {
+        return 2;
+    } 
+    else if (hand1FullHouse && hand2FullHouse) 
+    {
+        return 0;
+    }
+
+
+    // Check for a flush
+
+    bool hand1Flush = true;
+    bool hand2Flush = true;
+
+    for (int i = 1; i < 7; i++) 
+    {
+        if (hand1[i][1] != hand1[0][1]) 
+        {
+            hand1Flush = false;
+        }
+        if (hand2[i][1] != hand2[0][1]) 
+        {
+            hand2Flush = false;
+        }
+    }
+    if (hand1Flush && !hand2Flush) 
+    {
+        return 1;
+    } 
+    else if (!hand1Flush && hand2Flush) 
+    {
+        return 2;
+    } 
+    else if (hand1Flush && hand2Flush) 
+    {
+        return 0;
+    }
+
+
+    // Check for a straight
+
+    std::string hand1Values = "";
+    std::string hand2Values = "";
+
+    for (int i = 0; i < 7; i++) 
+    {
+        hand1Values += hand1[i][0];
+        hand2Values += hand2[i][0];
+    }
+
+    std::string straight = "A23456789TJQKA";
+    bool hand1Straight = false;
+    bool hand2Straight = false;
+
+    for (int i = 0; i < 10; i++) 
+    {
+        if (hand1Values.find(straight.substr(i, 5)) != std::string::npos) 
+        {
+        hand1Straight = true;
+        }
+        if (hand2Values.find(straight.substr(i, 5)) != std::string::npos) 
+        {
+        hand2Straight = true;
+        }
+    }
+
+    if (hand1Straight && !hand2Straight) 
+    {
+        return 1;
+    } 
+    else if (!hand1Straight && hand2Straight) 
+    {
+        return 2;
+    } 
+    else if (hand1Straight && hand2Straight) 
+    {
+        return 0;
+    }
+
+
+    // Check for three of a kind
+
+    if (hand1ThreeOfAKind > hand2ThreeOfAKind) 
+    {
+        return 1;
+    } 
+    else if (hand1ThreeOfAKind < hand2ThreeOfAKind) 
+    {
+        return 2;
+    } 
+    else if (hand1ThreeOfAKind == hand2ThreeOfAKind)
+    {
+        return 0;
+    }
+
+
+    // Check for two pairs
+
+    int hand1PairCount = 0;
+    int hand2PairCount = 0;
+
+    for (int i = 0; i < 7; i++) 
+    {
+        int hand1Count = 0;
+        int hand2Count = 0;
+        for (int j = 0; j < 7; j++) 
+        {
+            if (hand1[i][0] == hand1[j][0]) 
+            {
+                hand1Count++;
+            }
+            if (hand2[i][0] == hand2[j][0]) 
+            {
+                hand2Count++;
+            }
+        }
+        if (hand1Count == 2) 
+        {
+            hand1PairCount++;
+        }
+        if (hand2Count == 2) 
+        {
+            hand2PairCount++;
+        }
+    }
+
+    if (hand1PairCount > hand2PairCount)
+    {
+        return 1;
+    } 
+    else if (hand1PairCount < hand2PairCount) 
+    {
+        return 2;
+    }
+    else if (hand1PairCount == hand2PairCount) 
+    {
+        return 0;
+    }
+
+
+    // Check for a pair
+
+    if (hand1Pair > hand2Pair) 
+    {
+        return 1;
+    } 
+    else if (hand1Pair < hand2Pair) 
+    {
+        return 2;
+    } 
+    else if (hand1Pair == hand2Pair) 
+    {
+        return 0;
+    }
+
+
+    // If all else fails, compare the highest card in each hand
+
+    std::string hand1Sorted[7];
+    std::string hand2Sorted[7];
+
+    for (int i = 0; i < 7; i++) 
+    {
+        hand1Sorted[i] = hand1[i];
+        hand2Sorted[i] = hand2[i];
+    }
+
+    std::sort(hand1Sorted, hand1Sorted + 7);
+    std::sort(hand2Sorted, hand2Sorted + 7);
+    
+    if (hand1Sorted[6][0] > hand2Sorted[6][0]) 
+    {
+        return 1;
+    } 
+    else if (hand1Sorted[6][0] < hand2Sorted[6][0]) 
+    {
+        return 2;
+    }
+    else 
+    {
+        return 0;
+    }
 }
 
 string Game::getPlayerDecision(int player_num)
